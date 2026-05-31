@@ -19,10 +19,20 @@ import { cn } from "@/lib/utils"
 
 type Align = "left" | "center" | "right"
 type SortDirection = "asc" | "desc"
+type ColumnType =
+  | "text"
+  | "longText"
+  | "shortText"
+  | "number"
+  | "currency"
+  | "date"
+  | "status"
+  | "actions"
 
 export type OpenUITableColumn<TData> = {
   key: Extract<keyof TData, string> | string
   label: string
+  type?: ColumnType
   width?: number
   minWidth?: number
   sortable?: boolean
@@ -58,6 +68,26 @@ const alignClass: Record<Align, string> = {
   left: "justify-start text-left",
   center: "justify-center text-center",
   right: "justify-end text-right",
+}
+
+const columnTypeSizes: Record<ColumnType, { width: number; minWidth: number }> = {
+  text: { width: 180, minWidth: 120 },
+  longText: { width: 280, minWidth: 180 },
+  shortText: { width: 140, minWidth: 96 },
+  number: { width: 104, minWidth: 80 },
+  currency: { width: 124, minWidth: 96 },
+  date: { width: 132, minWidth: 112 },
+  status: { width: 128, minWidth: 104 },
+  actions: { width: 72, minWidth: 56 },
+}
+
+function getColumnSizes<TData>(column: OpenUITableColumn<TData>) {
+  const preset = columnTypeSizes[column.type ?? "text"]
+
+  return {
+    width: column.width ?? preset.width,
+    minWidth: column.minWidth ?? preset.minWidth,
+  }
 }
 
 function getValue<TData>(row: TData, key: string) {
@@ -218,24 +248,30 @@ export function Table<TData>({
           ]
         : []),
       ...columns.map(
-        (column): ColumnDef<TData> => ({
-          id: String(column.key),
-          accessorFn: (row) => getValue(row, String(column.key)),
-          size: column.width ?? 160,
-          minSize: column.minWidth ?? 96,
-          enableSorting: sortable && column.sortable !== false,
-          enableResizing: resizable && column.resizable !== false,
-          header: column.label,
-          cell: ({ row }) => {
-            const value = getValue(row.original, String(column.key))
+        (column): ColumnDef<TData> => {
+          const sizes = getColumnSizes(column)
 
-            return column.render ? column.render(row.original) : String(value ?? "")
-          },
-          meta: {
-            align: column.align ?? "left",
-            className: column.className,
-          },
-        })
+          return {
+            id: String(column.key),
+            accessorFn: (row) => getValue(row, String(column.key)),
+            size: sizes.width,
+            minSize: sizes.minWidth,
+            enableSorting: sortable && column.sortable !== false,
+            enableResizing: resizable && column.resizable !== false,
+            header: column.label,
+            cell: ({ row }) => {
+              const value = getValue(row.original, String(column.key))
+
+              return column.render
+                ? column.render(row.original)
+                : String(value ?? "")
+            },
+            meta: {
+              align: column.align ?? "left",
+              className: column.className,
+            },
+          }
+        }
       ),
     ],
     [columns, hasSelection, resizable, sortable]

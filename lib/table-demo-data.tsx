@@ -63,14 +63,13 @@ export const demoColumns: OpenUITableColumn<DemoUser>[] = [
   {
     key: "id",
     label: "ID",
+    type: "shortText",
     width: 96,
-    minWidth: 72,
   },
   {
     key: "user",
     label: "User",
-    width: 280,
-    minWidth: 180,
+    type: "longText",
     render: (row) => (
       <span className="flex min-w-0 flex-col">
         <span className="truncate font-medium">{row.user}</span>
@@ -81,20 +80,17 @@ export const demoColumns: OpenUITableColumn<DemoUser>[] = [
   {
     key: "role",
     label: "Role",
-    width: 160,
-    minWidth: 128,
+    type: "shortText",
   },
   {
     key: "team",
     label: "Team",
-    width: 160,
-    minWidth: 128,
+    type: "shortText",
   },
   {
     key: "status",
     label: "Status",
-    width: 150,
-    minWidth: 120,
+    type: "status",
     render: (row) => (
       <span className="text-xs font-semibold uppercase tracking-wider">
         {row.status}
@@ -104,14 +100,12 @@ export const demoColumns: OpenUITableColumn<DemoUser>[] = [
   {
     key: "lastSeen",
     label: "Last seen",
-    width: 190,
-    minWidth: 144,
+    type: "date",
   },
   {
     key: "score",
     label: "Score",
-    width: 112,
-    minWidth: 88,
+    type: "number",
     align: "right",
   },
 ]

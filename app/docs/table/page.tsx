@@ -12,9 +12,9 @@ import {
 const usageCode = `import { Table } from "@/components/openui/table"
 
 const columns = [
-  { key: "id", label: "ID", width: 96 },
-  { key: "user", label: "User", width: 280 },
-  { key: "score", label: "Score", align: "right" },
+  { key: "id", label: "ID", type: "shortText", width: 96 },
+  { key: "user", label: "User", type: "longText" },
+  { key: "score", label: "Score", type: "number", align: "right" },
 ]
 
 export function UsersTable({ users }) {
@@ -41,7 +41,10 @@ const selectionCode = `const [selectedRows, setSelectedRows] = React.useState<st
 
 const props = [
   ["data", "Rows to render."],
-  ["columns", "Simple column config with key, label, width, render, and align."],
+  ["columns", "Simple column config with key, label, type, width, render, and align."],
+  ["column.type", "Width preset: text, longText, shortText, number, currency, date, status, or actions."],
+  ["column.width", "Manual width override. Wins over the type preset."],
+  ["column.minWidth", "Manual minimum width override. Wins over the type preset."],
   ["selection", "Adds checkbox selection. Pass selectedRows and onSelectedRowsChange."],
   ["resizable", "Enables column resizing. Default: true."],
   ["sortable", "Enables sorting. Default: true."],
