@@ -307,25 +307,20 @@ export function Table<TData>({
     event.currentTarget.setPointerCapture(event.pointerId)
 
     const startX = event.clientX
-    const startSize = header.column.getSize()
-    const nextStartSize = nextHeader.column.getSize()
+    const startSize = getColumnWidth(header.column.id, header.column.getSize())
+    const nextStartSize = getColumnWidth(
+      nextHeader.column.id,
+      nextHeader.column.getSize()
+    )
     const minSize = header.column.columnDef.minSize ?? 96
     const nextMinSize = nextHeader.column.columnDef.minSize ?? 96
 
     const onPointerMove = (moveEvent: PointerEvent) => {
       const delta = moveEvent.clientX - startX
-      const nextSize = Math.max(minSize, startSize + delta)
-      const neighborSize = Math.max(nextMinSize, nextStartSize - delta)
-      const clampedDelta = nextSize - startSize
-
-      if (
-        nextSize === minSize ||
-        neighborSize === nextMinSize ||
-        startSize + clampedDelta < minSize ||
-        nextStartSize - clampedDelta < nextMinSize
-      ) {
-        return
-      }
+      const clampedDelta = Math.min(
+        Math.max(delta, minSize - startSize),
+        nextStartSize - nextMinSize
+      )
 
       setColumnSizing((current) => ({
         ...current,
