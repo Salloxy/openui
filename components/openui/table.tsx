@@ -249,8 +249,11 @@ export function Table<TData>({
                 <Checkbox
                   aria-label="Select all rows"
                   checked={
-                    table.getIsAllRowsSelected() ||
-                    (table.getIsSomeRowsSelected() && "indeterminate")
+                    table.getIsAllRowsSelected()
+                      ? true
+                      : table.getIsSomeRowsSelected()
+                        ? "indeterminate"
+                        : false
                   }
                   onCheckedChange={(value) =>
                     table.toggleAllRowsSelected(Boolean(value))
