@@ -225,6 +225,7 @@ export function Table<TData>({
   const tableRootRef = React.useRef<HTMLDivElement>(null)
   const tableScrollRef = React.useRef<HTMLDivElement>(null)
   const [scrollMargin, setScrollMargin] = React.useState(0)
+  const [containerWidth, setContainerWidth] = React.useState(0)
 
   React.useLayoutEffect(() => {
     if (scrollMode !== "page" || !tableRootRef.current) {
@@ -243,6 +244,21 @@ export function Table<TData>({
 
     return () => window.removeEventListener("resize", measure)
   }, [scrollMode])
+
+  React.useLayoutEffect(() => {
+    if (!tableRootRef.current) {
+      return
+    }
+
+    const root = tableRootRef.current
+    const updateWidth = () => setContainerWidth(root.clientWidth)
+    const observer = new ResizeObserver(updateWidth)
+
+    updateWidth()
+    observer.observe(root)
+
+    return () => observer.disconnect()
+  }, [])
 
   const windowVirtualizer = useWindowVirtualizer({
     count: rows.length,
@@ -266,7 +282,15 @@ export function Table<TData>({
   const virtualRows = virtualizer.getVirtualItems()
   const totalSize = virtualizer.getTotalSize()
   const leafHeaders = table.getFlatHeaders()
-  const tableWidth = table.getTotalSize()
+  const rawTableWidth = table.getTotalSize()
+  const tableWidth = Math.max(rawTableWidth, containerWidth)
+  const fillColumnId = leafHeaders.at(-1)?.column.id
+  const extraWidth = Math.max(0, tableWidth - rawTableWidth)
+  const getColumnWidth = React.useCallback(
+    (columnId: string, size: number) =>
+      columnId === fillColumnId ? size + extraWidth : size,
+    [extraWidth, fillColumnId]
+  )
 
   function resizeWithNeighbor(
     headerIndex: number,
@@ -339,7 +363,7 @@ export function Table<TData>({
       >
         <table
           className="grid w-full caption-bottom text-sm"
-          style={{ minWidth: tableWidth, width: tableWidth }}
+          style={{ minWidth: rawTableWidth, width: tableWidth }}
         >
           <TableHeader className="grid">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -362,7 +386,7 @@ export function Table<TData>({
                         alignClass[align]
                       )}
                       style={{
-                        width: header.getSize(),
+                        width: getColumnWidth(header.column.id, header.getSize()),
                         minWidth: header.column.columnDef.minSize,
                       }}
                     >
@@ -443,7 +467,10 @@ export function Table<TData>({
                             meta?.className
                           )}
                           style={{
-                            width: cell.column.getSize(),
+                            width: getColumnWidth(
+                              cell.column.id,
+                              cell.column.getSize()
+                            ),
                             minWidth: cell.column.columnDef.minSize,
                           }}
                         >
