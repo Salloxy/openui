@@ -39,11 +39,20 @@ const selectionCode = `const [selectedRows, setSelectedRows] = React.useState<st
   }}
 />`
 
+const widthCode = `const columns = [
+  { key: "name", label: "Name", type: "text" },
+  { key: "description", label: "Description", type: "longText", grow: 3 },
+  { key: "net", label: "Net", type: "currency", align: "right", grow: false },
+]
+
+// Extra space is shared by growable columns.
+// Too little space keeps min widths and uses horizontal scroll.`
+
 const props = [
   ["data", "Rows to render."],
   ["columns", "Simple column config with key, label, type, width, render, and align."],
   ["column.type", "Width preset: text, longText, shortText, number, currency, date, status, or actions."],
-  ["column.grow", "Controls how extra container width is shared. Text presets grow by default."],
+  ["column.grow", "Controls how extra container width is shared. Text presets grow by default. Use false to keep a column compact."],
   ["column.width", "Manual width override. Wins over the type preset."],
   ["column.minWidth", "Manual minimum width override. Wins over the type preset."],
   ["selection", "Adds checkbox selection. Pass selectedRows and onSelectedRowsChange."],
@@ -67,7 +76,8 @@ export default function TableDocsPage() {
             <h1 className="text-4xl font-semibold tracking-tight">Table</h1>
             <p className="text-base text-muted-foreground">
               A shadcn-compatible table with TanStack sorting, resizing, row
-              selection, and virtualization.
+              selection, virtualization, growth-based widths, and full-header
+              sorting.
             </p>
           </div>
           <pre className="overflow-x-auto rounded-md border bg-muted p-4 text-sm">
@@ -97,6 +107,21 @@ export default function TableDocsPage() {
 
           <Card>
             <CardHeader>
+              <CardTitle>Column widths</CardTitle>
+              <CardDescription>
+                Presets handle common column sizes, and grow controls how extra
+                space is shared.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="overflow-x-auto rounded-md bg-muted p-4 text-sm">
+                <code>{widthCode}</code>
+              </pre>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Selection</CardTitle>
               <CardDescription>
                 Selection is controlled when you pass selectedRows.
@@ -108,6 +133,16 @@ export default function TableDocsPage() {
               </pre>
             </CardContent>
           </Card>
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Header behavior
+          </h2>
+          <div className="rounded-md border p-4 text-sm text-muted-foreground">
+            Hovering a header shows the available resize dividers. Sortable
+            columns can be sorted by clicking anywhere inside the header cell.
+          </div>
         </section>
 
         <section className="flex flex-col gap-4">
