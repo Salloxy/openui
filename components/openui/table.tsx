@@ -40,7 +40,11 @@ export type OpenUITableColumn<TData> = {
   resizable?: boolean
   align?: Align
   render?: (row: TData) => React.ReactNode
+  footer?:
+    | React.ReactNode
+    | ((context: { data: TData[]; rows: TData[] }) => React.ReactNode)
   className?: string
+  footerClassName?: string
 }
 
 export type OpenUITableSelection = {
@@ -62,7 +66,18 @@ export type OpenUITableProps<TData> = {
   tableHeight?: number
   rowHeight?: number
   emptyText?: string
+  caption?: React.ReactNode
   className?: string
+  containerClassName?: string
+  tableClassName?: string
+  headerClassName?: string
+  bodyClassName?: string
+  footerClassName?: string
+  captionClassName?: string
+}
+
+export type TablePrimitiveProps = React.ComponentProps<"table"> & {
+  containerClassName?: string
 }
 
 const alignClass: Record<Align, string> = {
@@ -130,7 +145,10 @@ function getNextValue<TValue>(
     : updater
 }
 
-function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
+export function TableHeader({
+  className,
+  ...props
+}: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
@@ -140,7 +158,10 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   )
 }
 
-function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
+export function TableBody({
+  className,
+  ...props
+}: React.ComponentProps<"tbody">) {
   return (
     <tbody
       data-slot="table-body"
@@ -150,7 +171,23 @@ function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
   )
 }
 
-function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
+export function TableFooter({
+  className,
+  ...props
+}: React.ComponentProps<"tfoot">) {
+  return (
+    <tfoot
+      data-slot="table-footer"
+      className={cn(
+        "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+export function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
   return (
     <tr
       data-slot="table-row"
@@ -163,7 +200,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
   )
 }
 
-function TableHead({ className, ...props }: React.ComponentProps<"th">) {
+export function TableHead({ className, ...props }: React.ComponentProps<"th">) {
   return (
     <th
       data-slot="table-head"
@@ -176,7 +213,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
   )
 }
 
-function TableCell({ className, ...props }: React.ComponentProps<"td">) {
+export function TableCell({ className, ...props }: React.ComponentProps<"td">) {
   return (
     <td
       data-slot="table-cell"
@@ -189,7 +226,39 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
   )
 }
 
-export function Table<TData>({
+export function TableCaption({
+  className,
+  ...props
+}: React.ComponentProps<"caption">) {
+  return (
+    <caption
+      data-slot="table-caption"
+      className={cn("mt-4 text-sm text-muted-foreground", className)}
+      {...props}
+    />
+  )
+}
+
+function PrimitiveTable({
+  className,
+  containerClassName,
+  ...props
+}: TablePrimitiveProps) {
+  return (
+    <div
+      data-slot="table-container"
+      className={cn("relative w-full overflow-x-auto", containerClassName)}
+    >
+      <table
+        data-slot="table"
+        className={cn("w-full caption-bottom text-sm", className)}
+        {...props}
+      />
+    </div>
+  )
+}
+
+function DataTable<TData>({
   data,
   columns,
   getRowId,
@@ -202,7 +271,14 @@ export function Table<TData>({
   tableHeight = 560,
   rowHeight = 56,
   emptyText = "No results.",
+  caption,
   className,
+  containerClassName,
+  tableClassName,
+  headerClassName,
+  bodyClassName,
+  footerClassName,
+  captionClassName,
 }: OpenUITableProps<TData>) {
   const isSelectionControlled = selection?.selectedRows !== undefined
   const [internalSelectedRows, setInternalSelectedRows] = React.useState(
@@ -334,6 +410,10 @@ export function Table<TData>({
   })
 
   const rows = table.getRowModel().rows
+  const renderedRows = React.useMemo(
+    () => rows.map((row) => row.original),
+    [rows]
+  )
   const tableRootRef = React.useRef<HTMLDivElement>(null)
   const tableScrollRef = React.useRef<HTMLDivElement>(null)
   const [scrollMargin, setScrollMargin] = React.useState(0)
@@ -394,6 +474,7 @@ export function Table<TData>({
   const virtualRows = virtualizer.getVirtualItems()
   const totalSize = virtualizer.getTotalSize()
   const leafHeaders = table.getFlatHeaders()
+  const visibleLeafHeaders = table.getVisibleLeafColumns()
   const rawTableWidth = table.getTotalSize()
   const tableWidth = Math.max(rawTableWidth, containerWidth)
   const extraWidth = Math.max(0, tableWidth - rawTableWidth)
@@ -422,6 +503,7 @@ export function Table<TData>({
     },
     [extraWidth, growByColumn, totalGrow]
   )
+  const hasFooter = columns.some((column) => column.footer !== undefined)
 
   function resizeWithNeighbor(
     headerIndex: number,
@@ -476,7 +558,8 @@ export function Table<TData>({
         "relative rounded-md border bg-background",
         scrollMode === "page" && "overflow-x-auto overflow-y-clip",
         scrollMode === "table" && "overflow-hidden",
-        className
+        className,
+        containerClassName
       )}
     >
       <div
@@ -488,10 +571,13 @@ export function Table<TData>({
         style={scrollMode === "table" ? { height: tableHeight } : undefined}
       >
         <table
-          className="grid w-full caption-bottom text-sm"
+          className={cn("grid w-full caption-bottom text-sm", tableClassName)}
           style={{ minWidth: rawTableWidth, width: tableWidth }}
         >
-          <TableHeader className="grid">
+          {caption ? (
+            <TableCaption className={captionClassName}>{caption}</TableCaption>
+          ) : null}
+          <TableHeader className={cn("grid", headerClassName)}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="flex">
                 {headerGroup.headers.map((header, headerIndex) => {
@@ -578,7 +664,10 @@ export function Table<TData>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody className="relative grid" style={{ height: totalSize }}>
+          <TableBody
+            className={cn("relative grid", bodyClassName)}
+            style={{ height: totalSize }}
+          >
             {virtualRows.length ? (
               virtualRows.map((virtualRow) => {
                 const row = rows[virtualRow.index]
@@ -639,8 +728,69 @@ export function Table<TData>({
               </TableRow>
             )}
           </TableBody>
+          {hasFooter ? (
+            <TableFooter className={cn("grid", footerClassName)}>
+              <TableRow className="flex">
+                {hasSelection ? (
+                  <TableCell
+                    className="flex items-center px-3"
+                    style={{
+                      width: getColumnWidth(
+                        visibleLeafHeaders[0].id,
+                        visibleLeafHeaders[0].getSize()
+                      ),
+                      minWidth: visibleLeafHeaders[0].columnDef.minSize,
+                    }}
+                  />
+                ) : null}
+                {columns.map((column) => {
+                  const tableColumn = table.getColumn(String(column.key))
+
+                  if (!tableColumn) {
+                    return null
+                  }
+
+                  const align = column.align ?? "left"
+                  const footer =
+                    typeof column.footer === "function"
+                      ? column.footer({ data, rows: renderedRows })
+                      : column.footer
+
+                  return (
+                    <TableCell
+                      key={String(column.key)}
+                      className={cn(
+                        "flex items-center px-3",
+                        alignClass[align],
+                        column.footerClassName
+                      )}
+                      style={{
+                        width: getColumnWidth(
+                          tableColumn.id,
+                          tableColumn.getSize()
+                        ),
+                        minWidth: tableColumn.columnDef.minSize,
+                      }}
+                    >
+                      <span className="truncate">{footer}</span>
+                    </TableCell>
+                  )
+                })}
+              </TableRow>
+            </TableFooter>
+          ) : null}
         </table>
       </div>
     </div>
   )
+}
+
+export function Table<TData>(
+  props: OpenUITableProps<TData> | TablePrimitiveProps
+) {
+  if ("data" in props && "columns" in props) {
+    return <DataTable {...props} />
+  }
+
+  return <PrimitiveTable {...props} />
 }

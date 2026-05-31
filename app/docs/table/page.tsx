@@ -27,6 +27,43 @@ export function UsersTable({ users }) {
   )
 }`
 
+const primitiveCode = `import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/openui/table"
+
+export function InvoicesTable() {
+  return (
+    <Table>
+      <TableCaption>A list of invoices.</TableCaption>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Invoice</TableHead>
+          <TableHead className="text-right">Amount</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>INV001</TableCell>
+          <TableCell className="text-right">$250.00</TableCell>
+        </TableRow>
+      </TableBody>
+      <TableFooter>
+        <TableRow>
+          <TableCell>Total</TableCell>
+          <TableCell className="text-right">$250.00</TableCell>
+        </TableRow>
+      </TableFooter>
+    </Table>
+  )
+}`
+
 const selectionCode = `const [selectedRows, setSelectedRows] = React.useState<string[]>([])
 
 <Table
@@ -48,6 +85,19 @@ const widthCode = `const columns = [
 // Extra space is shared by growable columns.
 // Too little space keeps min widths and uses horizontal scroll.`
 
+const footerCode = `const columns = [
+  { key: "collected", label: "Collected", type: "currency", footer: "$1,301.00" },
+  { key: "cost", label: "Cost", type: "currency", footer: "$726.55" },
+  {
+    key: "net",
+    label: "Net",
+    type: "currency",
+    align: "right",
+    footer: ({ rows }) =>
+      rows.reduce((total, row) => total + row.net, 0).toLocaleString(),
+  },
+]`
+
 const props = [
   ["data", "Rows to render."],
   ["columns", "Simple column config with key, label, type, width, render, and align."],
@@ -55,12 +105,14 @@ const props = [
   ["column.grow", "Controls how extra container width is shared. Text presets grow by default. Use false to keep a column compact."],
   ["column.width", "Manual width override. Wins over the type preset."],
   ["column.minWidth", "Manual minimum width override. Wins over the type preset."],
+  ["column.footer", "Footer cell content. Pass a value or a function using data and rendered rows."],
   ["selection", "Adds checkbox selection. Pass selectedRows and onSelectedRowsChange."],
   ["resizable", "Enables column resizing. Default: true."],
   ["sortable", "Enables sorting. Default: true."],
   ["showUnsortedSortIcon", "Shows a muted chevron on sortable unsorted columns."],
   ["initialSort", "Defaults to the first sortable column ascending. Use false to start unsorted."],
   ["scrollMode", "Use page scroll by default, or table scroll with scrollMode='table'."],
+  ["caption", "Optional caption for the advanced data table."],
 ]
 
 export default function TableDocsPage() {
@@ -77,7 +129,7 @@ export default function TableDocsPage() {
             <p className="text-base text-muted-foreground">
               A shadcn-compatible table with TanStack sorting, resizing, row
               selection, virtualization, growth-based widths, and full-header
-              sorting.
+              sorting. It also exports the same primitive parts as shadcn table.
             </p>
           </div>
           <pre className="overflow-x-auto rounded-md border bg-muted p-4 text-sm">
@@ -107,6 +159,21 @@ export default function TableDocsPage() {
 
           <Card>
             <CardHeader>
+              <CardTitle>Primitive usage</CardTitle>
+              <CardDescription>
+                Use the same exported parts as shadcn table when you need full
+                markup control.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="overflow-x-auto rounded-md bg-muted p-4 text-sm">
+                <code>{primitiveCode}</code>
+              </pre>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>Column widths</CardTitle>
               <CardDescription>
                 Presets handle common column sizes, and grow controls how extra
@@ -116,6 +183,21 @@ export default function TableDocsPage() {
             <CardContent>
               <pre className="overflow-x-auto rounded-md bg-muted p-4 text-sm">
                 <code>{widthCode}</code>
+              </pre>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Footer</CardTitle>
+              <CardDescription>
+                Add footer cells to advanced columns for totals or summary
+                values.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <pre className="overflow-x-auto rounded-md bg-muted p-4 text-sm">
+                <code>{footerCode}</code>
               </pre>
             </CardContent>
           </Card>
