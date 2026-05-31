@@ -21,16 +21,14 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/black_logo_transparent.png",
-        type: "image/png",
-        sizes: "1254x1254",
+        url: "/logo.svg",
+        type: "image/svg+xml",
       },
     ],
     apple: [
       {
-        url: "/black_logo_transparent.png",
-        type: "image/png",
-        sizes: "1254x1254",
+        url: "/logo.svg",
+        type: "image/svg+xml",
       },
     ],
   },

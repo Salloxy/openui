@@ -25,11 +25,11 @@ export default function Home() {
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
               <Image
-                src="/black_logo_transparent.png"
+                src="/logo.svg"
                 alt=""
-                width={64}
+                width={46}
                 height={64}
-                className="size-14 object-contain sm:size-16"
+                style={{ width: 46, height: 64 }}
                 priority
               />
               <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
