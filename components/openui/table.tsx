@@ -500,12 +500,17 @@ export function Table<TData>({
                   const align = meta?.align ?? "left"
                   const showSortIcon =
                     sortState || (showUnsortedSortIcon && canSort)
+                  const renderedHeader = flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )
 
                   return (
                     <TableHead
                       key={header.id}
                       className={cn(
                         "group relative flex items-center px-3",
+                        canSort && "cursor-pointer",
                         alignClass[align]
                       )}
                       style={{
@@ -513,20 +518,33 @@ export function Table<TData>({
                         minWidth: header.column.columnDef.minSize,
                       }}
                     >
-                      <button
-                        type="button"
-                        className={cn(
-                          "inline-flex min-w-0 items-center gap-1.5 text-xs font-medium uppercase tracking-wider",
-                          canSort && "cursor-pointer"
-                        )}
-                        disabled={!canSort}
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
+                      {canSort ? (
+                        <button
+                          type="button"
+                          aria-label={`Sort ${
+                            typeof header.column.columnDef.header === "string"
+                              ? header.column.columnDef.header
+                              : "column"
+                          }`}
+                          className="absolute inset-0 z-0 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                          onClick={header.column.getToggleSortingHandler()}
+                        />
+                      ) : null}
+                      {headerIndex > 0 ? (
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-y-2 left-0 z-10 w-px bg-ring opacity-0 transition-opacity group-hover:opacity-100"
+                        />
+                      ) : null}
+                      {headerIndex < leafHeaders.length - 1 ? (
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute inset-y-2 right-0 z-10 w-px bg-ring opacity-0 transition-opacity group-hover:opacity-100"
+                        />
+                      ) : null}
+                      <div className="pointer-events-none relative z-10 inline-flex min-w-0 items-center gap-1.5 text-xs font-medium uppercase tracking-wider">
                         <span className="truncate">
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          {renderedHeader}
                         </span>
                         {showSortIcon ? (
                           sortState === "asc" ? (
@@ -537,14 +555,14 @@ export function Table<TData>({
                             <ChevronsUpDown data-icon="inline-end" />
                           )
                         ) : null}
-                      </button>
+                      </div>
                       {resizable &&
                       header.column.getCanResize() &&
                       headerIndex < leafHeaders.length - 1 ? (
                         <button
                           type="button"
                           aria-label="Resize column"
-                          className="absolute inset-y-2 right-0 w-3 cursor-col-resize border-r border-transparent outline-none transition-colors group-hover:border-ring focus-visible:border-ring active:border-ring"
+                          className="absolute inset-y-0 right-0 z-20 w-3 cursor-col-resize outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
                           onPointerDown={(event) =>
                             resizeWithNeighbor(headerIndex, event)
                           }
