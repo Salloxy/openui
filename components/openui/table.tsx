@@ -12,7 +12,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import { useVirtualizer, useWindowVirtualizer } from "@tanstack/react-virtual"
-import { ArrowDown, ArrowUp, ChevronsUpDown } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
@@ -312,7 +312,7 @@ export function Table<TData>({
     },
     getRowId: (row, index) => getRowId?.(row, index) ?? String(index),
     enableRowSelection: hasSelection,
-    enableSortingRemoval: true,
+    enableSortingRemoval: false,
     columnResizeMode: "onChange",
     onSortingChange: setSorting,
     onColumnSizingChange: setColumnSizing,
@@ -547,13 +547,14 @@ export function Table<TData>({
                           {renderedHeader}
                         </span>
                         {showSortIcon ? (
-                          sortState === "asc" ? (
-                            <ArrowUp data-icon="inline-end" />
-                          ) : sortState === "desc" ? (
-                            <ArrowDown data-icon="inline-end" />
-                          ) : (
-                            <ChevronsUpDown data-icon="inline-end" />
-                          )
+                          <ChevronDown
+                            data-icon="inline-end"
+                            className={cn(
+                              "transition-transform duration-200 ease-out",
+                              sortState === "asc" && "rotate-180",
+                              !sortState && "opacity-60"
+                            )}
+                          />
                         ) : null}
                       </div>
                       {resizable &&

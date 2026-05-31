@@ -58,8 +58,8 @@ const props = [
   ["selection", "Adds checkbox selection. Pass selectedRows and onSelectedRowsChange."],
   ["resizable", "Enables column resizing. Default: true."],
   ["sortable", "Enables sorting. Default: true."],
-  ["showUnsortedSortIcon", "Shows double arrows on sortable unsorted columns."],
-  ["initialSort", "Defaults to the first sortable column ascending. Use false to remove."],
+  ["showUnsortedSortIcon", "Shows a muted chevron on sortable unsorted columns."],
+  ["initialSort", "Defaults to the first sortable column ascending. Use false to start unsorted."],
   ["scrollMode", "Use page scroll by default, or table scroll with scrollMode='table'."],
 ]
 
@@ -142,6 +142,7 @@ export default function TableDocsPage() {
           <div className="rounded-md border p-4 text-sm text-muted-foreground">
             Hovering a header shows the available resize dividers. Sortable
             columns can be sorted by clicking anywhere inside the header cell.
+            Active sorting toggles between ascending and descending.
           </div>
         </section>
 
