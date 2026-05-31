@@ -70,6 +70,7 @@ export const demoColumns: OpenUITableColumn<DemoUser>[] = [
     key: "user",
     label: "User",
     type: "longText",
+    grow: 2,
     render: (row) => (
       <span className="flex min-w-0 flex-col">
         <span className="truncate font-medium">{row.user}</span>

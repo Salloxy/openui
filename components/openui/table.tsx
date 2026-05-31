@@ -33,6 +33,7 @@ export type OpenUITableColumn<TData> = {
   key: Extract<keyof TData, string> | string
   label: string
   type?: ColumnType
+  grow?: boolean | number
   width?: number
   minWidth?: number
   sortable?: boolean
@@ -70,15 +71,18 @@ const alignClass: Record<Align, string> = {
   right: "justify-end text-right",
 }
 
-const columnTypeSizes: Record<ColumnType, { width: number; minWidth: number }> = {
-  text: { width: 180, minWidth: 120 },
-  longText: { width: 280, minWidth: 180 },
-  shortText: { width: 140, minWidth: 96 },
-  number: { width: 104, minWidth: 80 },
-  currency: { width: 124, minWidth: 96 },
-  date: { width: 132, minWidth: 112 },
-  status: { width: 128, minWidth: 104 },
-  actions: { width: 72, minWidth: 56 },
+const columnTypeSizes: Record<
+  ColumnType,
+  { width: number; minWidth: number; grow: number }
+> = {
+  text: { width: 180, minWidth: 120, grow: 1 },
+  longText: { width: 280, minWidth: 180, grow: 2 },
+  shortText: { width: 140, minWidth: 96, grow: 0.5 },
+  number: { width: 104, minWidth: 80, grow: 0 },
+  currency: { width: 124, minWidth: 96, grow: 0 },
+  date: { width: 132, minWidth: 112, grow: 0 },
+  status: { width: 128, minWidth: 104, grow: 0 },
+  actions: { width: 72, minWidth: 56, grow: 0 },
 }
 
 function getColumnSizes<TData>(column: OpenUITableColumn<TData>) {
@@ -88,6 +92,22 @@ function getColumnSizes<TData>(column: OpenUITableColumn<TData>) {
     width: column.width ?? preset.width,
     minWidth: column.minWidth ?? preset.minWidth,
   }
+}
+
+function getColumnGrow<TData>(column: OpenUITableColumn<TData>) {
+  if (typeof column.grow === "number") {
+    return Math.max(0, column.grow)
+  }
+
+  if (column.grow === true) {
+    return 1
+  }
+
+  if (column.grow === false) {
+    return 0
+  }
+
+  return columnTypeSizes[column.type ?? "text"].grow
 }
 
 function getValue<TData>(row: TData, key: string) {
@@ -269,6 +289,7 @@ export function Table<TData>({
             meta: {
               align: column.align ?? "left",
               className: column.className,
+              grow: getColumnGrow(column),
             },
           }
         }
@@ -372,12 +393,31 @@ export function Table<TData>({
   const leafHeaders = table.getFlatHeaders()
   const rawTableWidth = table.getTotalSize()
   const tableWidth = Math.max(rawTableWidth, containerWidth)
-  const fillColumnId = leafHeaders.at(-1)?.column.id
   const extraWidth = Math.max(0, tableWidth - rawTableWidth)
+  const growByColumn = React.useMemo(() => {
+    return Object.fromEntries(
+      leafHeaders.map((header) => {
+        const meta = header.column.columnDef.meta as
+          | { grow?: number }
+          | undefined
+
+        return [header.column.id, meta?.grow ?? 0]
+      })
+    )
+  }, [leafHeaders])
+  const totalGrow = React.useMemo(
+    () => Object.values(growByColumn).reduce((total, grow) => total + grow, 0),
+    [growByColumn]
+  )
   const getColumnWidth = React.useCallback(
-    (columnId: string, size: number) =>
-      columnId === fillColumnId ? size + extraWidth : size,
-    [extraWidth, fillColumnId]
+    (columnId: string, size: number) => {
+      if (!extraWidth || !totalGrow) {
+        return size
+      }
+
+      return size + extraWidth * ((growByColumn[columnId] ?? 0) / totalGrow)
+    },
+    [extraWidth, growByColumn, totalGrow]
   )
 
   function resizeWithNeighbor(

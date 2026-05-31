@@ -13,7 +13,7 @@ const usageCode = `import { Table } from "@/components/openui/table"
 
 const columns = [
   { key: "id", label: "ID", type: "shortText", width: 96 },
-  { key: "user", label: "User", type: "longText" },
+  { key: "user", label: "User", type: "longText", grow: 2 },
   { key: "score", label: "Score", type: "number", align: "right" },
 ]
 
@@ -43,6 +43,7 @@ const props = [
   ["data", "Rows to render."],
   ["columns", "Simple column config with key, label, type, width, render, and align."],
   ["column.type", "Width preset: text, longText, shortText, number, currency, date, status, or actions."],
+  ["column.grow", "Controls how extra container width is shared. Text presets grow by default."],
   ["column.width", "Manual width override. Wins over the type preset."],
   ["column.minWidth", "Manual minimum width override. Wins over the type preset."],
   ["selection", "Adds checkbox selection. Pass selectedRows and onSelectedRowsChange."],
