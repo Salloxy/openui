@@ -18,6 +18,22 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "OpenUI",
   description: "Shadcn-compatible components for production apps.",
+  icons: {
+    icon: [
+      {
+        url: "/black_logo.png",
+        type: "image/png",
+        sizes: "1254x1254",
+      },
+    ],
+    apple: [
+      {
+        url: "/black_logo.png",
+        type: "image/png",
+        sizes: "1254x1254",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

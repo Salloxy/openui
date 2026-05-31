@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 
 import { Button } from "@/components/ui/button"
 
@@ -6,8 +7,16 @@ export function SiteHeader() {
   return (
     <header className="border-b bg-background">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="text-sm font-semibold">
-          OpenUI
+        <Link href="/" className="flex items-center gap-2 text-sm font-semibold">
+          <Image
+            src="/black_logo.png"
+            alt=""
+            width={28}
+            height={28}
+            className="size-7 object-contain"
+            priority
+          />
+          <span>OpenUI</span>
         </Link>
         <nav className="flex items-center gap-1">
           <Button asChild variant="ghost" size="sm">
@@ -21,4 +30,3 @@ export function SiteHeader() {
     </header>
   )
 }
-

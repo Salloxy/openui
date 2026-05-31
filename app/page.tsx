@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 
 import { SiteHeader } from "@/components/site-header"
 import { TablePreview } from "@/components/table-preview"
@@ -22,9 +23,19 @@ export default function Home() {
             Registry
           </Badge>
           <div className="flex flex-col gap-3">
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-              OpenUI
-            </h1>
+            <div className="flex items-center gap-3">
+              <Image
+                src="/black_logo.png"
+                alt=""
+                width={64}
+                height={64}
+                className="size-14 object-contain sm:size-16"
+                priority
+              />
+              <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
+                OpenUI
+              </h1>
+            </div>
             <p className="max-w-2xl text-base text-muted-foreground">
               Shadcn-compatible components with practical defaults and simple
               install commands.
