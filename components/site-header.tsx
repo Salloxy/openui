@@ -9,7 +9,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2 text-sm font-semibold">
           <Image
-            src="/black_logo.png"
+            src="/black_logo_transparent.png"
             alt=""
             width={28}
             height={28}
