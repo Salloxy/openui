@@ -555,7 +555,7 @@ function DataTable<TData>({
     <div
       ref={tableRootRef}
       className={cn(
-        "relative rounded-md border bg-background",
+        "relative w-full border",
         scrollMode === "page" && "overflow-x-auto overflow-y-clip",
         scrollMode === "table" && "overflow-hidden",
         className,
@@ -577,7 +577,7 @@ function DataTable<TData>({
           {caption ? (
             <TableCaption className={captionClassName}>{caption}</TableCaption>
           ) : null}
-          <TableHeader className={cn("grid", headerClassName)}>
+          <TableHeader className={cn("grid bg-muted", headerClassName)}>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="flex">
                 {headerGroup.headers.map((header, headerIndex) => {
@@ -729,7 +729,7 @@ function DataTable<TData>({
             )}
           </TableBody>
           {hasFooter ? (
-            <TableFooter className={cn("grid", footerClassName)}>
+            <TableFooter className={cn("grid bg-muted", footerClassName)}>
               <TableRow className="flex">
                 {hasSelection ? (
                   <TableCell
