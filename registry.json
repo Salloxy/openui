@@ -13,7 +13,7 @@
         "@tanstack/react-virtual",
         "lucide-react"
       ],
-      "registryDependencies": ["checkbox", "table"],
+      "registryDependencies": ["checkbox"],
       "files": [
         {
           "path": "components/openui/table.tsx",
