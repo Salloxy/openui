@@ -1,0 +1,25 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "openui",
+  "homepage": "https://openuis.vercel.app",
+  "items": [
+    {
+      "name": "table",
+      "type": "registry:component",
+      "title": "Table",
+      "description": "A virtualized shadcn-compatible table with sorting, resizing, and optional selection.",
+      "dependencies": [
+        "@tanstack/react-table",
+        "@tanstack/react-virtual",
+        "lucide-react"
+      ],
+      "registryDependencies": ["checkbox", "table"],
+      "files": [
+        {
+          "path": "components/openui/table.tsx",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}
